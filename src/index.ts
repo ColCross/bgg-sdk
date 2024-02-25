@@ -1,5 +1,5 @@
-// Dummy test function for setting up npm package
+import * as hot from "~/routes/hot";
 
-export function add(a: number, b: number): number {
-  return a + b;
+export const bgg = {
+  ...hot,
 }
