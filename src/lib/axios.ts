@@ -13,13 +13,13 @@ axiosRetry(axiosInstance, {
 
 axiosInstance.interceptors.response.use(
   (response) => {
-    const jsonData = convert.xml2js(response.data, {compact: true});
+    const jsonData = convert.xml2js(response.data, { compact: true });
     response.data = jsonData;
     return response;
   },
   (error) => {
     return Promise.reject({ message: "Error" });
-  }
+  },
 );
 
 export default axiosInstance;

@@ -10,7 +10,7 @@ type params = {
     | "rpgperson"
     | "boardgamecompany"
     | "rpgcompany"
-    | "videogamecompany"
+    | "videogamecompany";
 };
 
 type response = {
@@ -31,16 +31,13 @@ type item = {
 export const hot = async (params?: params): Promise<item[]> => {
   const { data } = await axios.get("/hot", { params });
 
-  return data.items.item.map(
-    (item: response) => {
-      return {
-        id: item._attributes.id,
-        rank: item._attributes.rank,
-        name: item.name._attributes.value,
-        yearpublished: item.yearpublished?._attributes.value,
-        thumbnail: item.thumbnail._attributes.value,
-      };
-    }
-  );
+  return data.items.item.map((item: response) => {
+    return {
+      id: item._attributes.id,
+      rank: item._attributes.rank,
+      name: item.name._attributes.value,
+      yearpublished: item.yearpublished?._attributes.value,
+      thumbnail: item.thumbnail._attributes.value,
+    };
+  });
 };
-
