@@ -31,6 +31,8 @@ type item = {
 export const hot = async (params?: params): Promise<item[]> => {
   const { data } = await axios.get("/hot", { params });
 
+  if (!data.items.item) return [];
+
   return data.items.item.map((item: response) => {
     return {
       id: item._attributes.id,
