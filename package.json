@@ -1,0 +1,36 @@
+{
+  "name": "bgg-node-sdk",
+  "version": "1.0.0-alpha",
+  "description": "Node SDK for querying the Board Game Geek (BGG) XML2 API with Typescript support",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ColCross/bgg-node-sdk"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "jest"
+  },
+  "keywords": [
+    "bgg",
+    "boardgamegeek",
+    "xmlapi2",
+    "xml",
+    "json"
+  ],
+  "author": "Colten Cross",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.0.2",
+    "typescript": "^5.3.3"
+  }
+}
