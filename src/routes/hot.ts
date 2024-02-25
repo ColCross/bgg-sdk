@@ -1,15 +1,16 @@
 import axios from "~/lib/axios";
 
+// TODO: Support typing for multiple types query
 type params = {
   type:
-    | "boardgame"
+    | boardgame
+    | videogame
     | "rpg"
-    | "videogame"
     | "boardgameperson"
     | "rpgperson"
     | "boardgamecompany"
     | "rpgcompany"
-    | "videogamecompany";
+    | "videogamecompany"
 };
 
 type response = {
