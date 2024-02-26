@@ -1,13 +1,27 @@
 import axios from "~/lib/axios";
 
-type params = {
+type args = {
   query: string;
-  type?:
+  type?: Array<
     | videogame
     | boardgame
     | "rpgitem"
     | "boardgameaccessory"
-    | "boardgameexpansion";
+    | "boardgameexpansion"
+  >;
+};
+
+type params = {
+  query: string;
+  type?: string;
+  exact?: boolean;
+};
+
+const getParams = (args: args): params => {
+  return {
+    query: args.query,
+    type: args.type ? args.type.join(",") : undefined,
+  };
 };
 
 type response = {
@@ -32,7 +46,8 @@ const transformData = (data: response): item => {
   };
 };
 
-export const search = async (params: params): Promise<item[]> => {
+export const search = async (args: args): Promise<item[]> => {
+  const params = getParams(args);
   const { data } = await axios.get("/search", { params });
 
   if (!data.items.item) return [];
@@ -42,13 +57,15 @@ export const search = async (params: params): Promise<item[]> => {
   });
 };
 
-export const searchExact = async (params: params): Promise<item | null> => {
+export const searchExact = async (args: args): Promise<item | null> => {
+  const params = getParams(args);
   const { data } = await axios.get("/search", {
     params: {
       ...params,
       exact: true,
     },
   });
+
   if (!data.items.item) return null;
   return transformData(data.items.item);
 };
