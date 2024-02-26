@@ -9,7 +9,6 @@ type params = {
     | "rpgitem"
     | "boardgameaccessory"
     | "boardgameexpansion";
-  exact?: true;
 };
 
 type response = {
@@ -34,17 +33,23 @@ const transformData = (data: response): item => {
   };
 };
 
-export const search = async (params: params): Promise<item[] | item | null> => {
+export const search = async (params: params): Promise<item[]> => {
   const { data } = await axios.get("/search", { params });
-
-  if (params.exact) {
-    if (!data.items.item) return null;
-    return transformData(data.items.item);
-  }
 
   if (!data.items.item) return [];
 
   return data.items.item.map((data: response) => {
     return transformData(data);
   });
+};
+
+export const searchExact = async (params: params): Promise<item | null> => {
+  const { data } = await axios.get("/search", {
+    params: {
+      ...params,
+      exact: true,
+    },
+  });
+  if (!data.items.item) return null;
+  return transformData(data.items.item);
 };
