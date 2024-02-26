@@ -50,7 +50,7 @@ const transformData = (data: response): item => {
   This file contains two functions:
   - The search function performs a generic search and always returns an array of items.
   - The searchExact function performs an exact search and returns a single item or null.
-  These two functions are separated to make consistent return types more consistent.
+  These two functions are separated to make return types more consistent.
 */
 
 export const search = async (args: args): Promise<item[]> => {
