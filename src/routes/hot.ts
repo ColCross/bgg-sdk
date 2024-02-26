@@ -1,7 +1,7 @@
 import axios from "~/lib/axios";
 
-type params = {
-  type:
+type args = {
+  type: Array<
     | boardgame
     | videogame
     | "rpg"
@@ -9,7 +9,20 @@ type params = {
     | "rpgperson"
     | "boardgamecompany"
     | "rpgcompany"
-    | "videogamecompany";
+    | "videogamecompany"
+  >;
+};
+
+type params = {
+  type: string;
+};
+
+const getParams = (args?: args): params | undefined => {
+  if (!args) return undefined;
+
+  return {
+    type: args.type.join(","),
+  };
 };
 
 type response = {
@@ -27,7 +40,8 @@ type item = {
   thumbnail: string;
 };
 
-export const hot = async (params?: params): Promise<item[]> => {
+export const hot = async (args?: args): Promise<item[]> => {
+  const params = getParams(args);
   const { data } = await axios.get("/hot", { params });
 
   if (!data.items.item) return [];
