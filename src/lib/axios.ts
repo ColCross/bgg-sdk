@@ -13,12 +13,16 @@ axiosRetry(axiosInstance, {
 
 axiosInstance.interceptors.response.use(
   (response) => {
-    const jsonData = convert.xml2js(response.data, { compact: true });
-    response.data = jsonData;
-    return response;
+    try {
+      const jsonData = convert.xml2js(response.data, { compact: true });
+      response.data = jsonData;
+      return response;
+    } catch (error) {
+      throw new Error("Failed to parse XML data from BGG");
+    }
   },
   (error) => {
-    return Promise.reject({ message: "Error" });
+    return Promise.reject(`Unexpected error calling BGG API: ${error.stack}`);
   },
 );
 
