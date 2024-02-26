@@ -1,4 +1,4 @@
-# bgg-node-sdk
+# bgg-sdk
 
 **WORK IN PROGRESS: NOT YET READY FOR USE**
 
