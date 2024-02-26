@@ -1,5 +1,7 @@
 import axios from "~/lib/axios";
 
+// TODO: Excluding poll data for now
+
 type params = {
   id: string;
   type: string;
@@ -49,38 +51,7 @@ type response = {
       value: string;
     };
   };
-  poll: {
-    _attributes: {
-      name: string;
-      title: string;
-      totalvotes: string;
-    };
-    results: {
-      _attributes: {
-        numplayers: string;
-      };
-      result: {
-        _attributes: {
-          value: string;
-          numvotes: string;
-        };
-      }[];
-    }[];
-  }[];
 };
-
-// type poll = {
-//     name: string;
-//     title: string;
-//     totalVotes: string;
-//     results: {
-//       numPlayers: string;
-//       result: {
-//         value: string;
-//         numVotes: string;
-//       }[];
-//     };
-// }
 
 type item = {
   id: string;
@@ -92,7 +63,6 @@ type item = {
   yearPublished: string;
   minPlayers: string;
   maxPlayers: string;
-  //   poll?: poll | poll[];
 };
 
 export const thing = async (params?: params): Promise<item | null> => {
@@ -111,24 +81,5 @@ export const thing = async (params?: params): Promise<item | null> => {
     yearPublished: data.yearpublished._attributes.value,
     minPlayers: data.minplayers._attributes.value,
     maxPlayers: data.maxplayers._attributes.value,
-    // TODO: Support polls in the future
-    // poll: data.poll.map((poll) => {
-    //   return {
-    //     name: poll._attributes.name,
-    //     title: poll._attributes.title,
-    //     totalVotes: poll._attributes.totalvotes,
-    //     results: poll.results.map((result) => {
-    //       return {
-    //         numPlayers: result._attributes.numplayers,
-    //         result: result.result.map((r) => {
-    //           return {
-    //             value: r._attributes.value,
-    //             numVotes: r._attributes.numvotes,
-    //           };
-    //         }),
-    //       };
-    //     }),
-    //   };
-    // }),
   };
 };
