@@ -25,12 +25,12 @@ type item = {
   yearPublished?: string;
 };
 
-const transformItem = (item: response): item => {
+const transformData = (data: response): item => {
   return {
-    id: item._attributes.id,
-    type: item._attributes.type,
-    name: item.name._attributes.value,
-    yearPublished: item.yearpublished?._attributes.value,
+    id: data._attributes.id,
+    type: data._attributes.type,
+    name: data.name._attributes.value,
+    yearPublished: data.yearpublished?._attributes.value,
   };
 };
 
@@ -41,10 +41,10 @@ export const search = async (params: params): Promise<item[]> => {
 
   // If using exact search, the response will be an object
   if (!Array.isArray(data.items.item)) {
-    return [transformItem(data.items.item)];
+    return [transformData(data.items.item)];
   }
 
-  return data.items.item.map((item: response) => {
-    return transformItem(item);
+  return data.items.item.map((data: response) => {
+    return transformData(data);
   });
 };

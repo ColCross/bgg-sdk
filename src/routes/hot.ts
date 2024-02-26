@@ -33,13 +33,13 @@ export const hot = async (params?: params): Promise<item[]> => {
 
   if (!data.items.item) return [];
 
-  return data.items.item.map((item: response) => {
+  return data.items.item.map((data: response) => {
     return {
-      id: item._attributes.id,
-      rank: item._attributes.rank,
-      name: item.name._attributes.value,
-      yearpublished: item.yearpublished?._attributes.value,
-      thumbnail: item.thumbnail._attributes.value,
+      id: data._attributes.id,
+      rank: data._attributes.rank,
+      name: data.name._attributes.value,
+      yearpublished: data.yearpublished?._attributes.value,
+      thumbnail: data.thumbnail._attributes.value,
     };
   });
 };
