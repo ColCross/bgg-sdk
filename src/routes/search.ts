@@ -1,6 +1,5 @@
 import axios from "~/lib/axios";
 
-// TODO: Support typing for multiple types query
 type params = {
   query: string;
   type?:

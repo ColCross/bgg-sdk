@@ -19,5 +19,7 @@ A modern SDK for interacting with the BoardGameGeek (BGG) XMLAPI2, written in Ty
 ## TODO
 
 - [ ] Implement remaining endpoints
+- [ ] Support typing for multiple types routes
+- [ ] Support poll data from thing route
 - [ ] Create unit tests for all endpoints
 - [ ] Set up continuous integration and deployment to npm using GitHub Actions
