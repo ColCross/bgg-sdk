@@ -34,15 +34,15 @@ const transformData = (data: response): item => {
   };
 };
 
-export const search = async (params: params): Promise<item[]> => {
+export const search = async (params: params): Promise<item[] | item | null> => {
   const { data } = await axios.get("/search", { params });
 
-  if (!data.items.item) return [];
-
-  // If using exact search, the response will be an object
-  if (!Array.isArray(data.items.item)) {
-    return [transformData(data.items.item)];
+  if (params.exact) {
+    if (!data.items.item) return null;
+    return transformData(data.items.item);
   }
+
+  if (!data.items.item) return [];
 
   return data.items.item.map((data: response) => {
     return transformData(data);
