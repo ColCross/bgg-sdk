@@ -2,8 +2,8 @@ import axios from "~/lib/axios";
 
 // TODO: Excluding poll data for now
 
-type params = {
-  id: string;
+type args = {
+  id: Array<string>;
   type?: Array<
     | boardgame
     | boardgameaccessory
@@ -18,8 +18,21 @@ type params = {
   marketplace: true;
   comments: true;
   ratingcomments: true;
-  page: string;
-  pagesize: string;
+  page: number;
+  pagesize: number;
+};
+
+type params = Omit<args, "id" | "type"> & {
+  id: string;
+  type?: string;
+};
+
+const getParams = (args: args): params => {
+  return {
+    ...args,
+    id: args.id.join(","),
+    type: args.type?.join(","),
+  };
 };
 
 type response = {
@@ -86,10 +99,10 @@ const transformData = (data: response): item => {
   };
 };
 
-export const thing = async (params?: params): Promise<item | null> => {
-  const response = await axios.get("/thing", { params });
-  const data: response = response.data.items.item;
+export const thing = async (args: args): Promise<item | null> => {
+  const params = getParams(args);
+  const { data } = await axios.get("/thing", { params });
 
-  if (!response.data.items.item) return null;
+  if (!data.items.item) return null;
   return transformData(data);
 };
