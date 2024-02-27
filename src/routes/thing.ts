@@ -71,6 +71,33 @@ type response = {
       value: string;
     };
   };
+  playingtime?: {
+    _attributes: {
+      value: string;
+    };
+  };
+  minplaytime?: {
+    _attributes: {
+      value: string;
+    };
+  };
+  maxplaytime?: {
+    _attributes: {
+      value: string;
+    };
+  };
+  minage?: {
+    _attributes: {
+      value: string;
+    };
+  };
+  link?: {
+    _attributes: {
+      type: string;
+      id: string;
+      value: string;
+    };
+  }[];
 };
 
 type item = {
@@ -83,6 +110,15 @@ type item = {
   yearPublished: string;
   minPlayers: string;
   maxPlayers: string;
+  playingTime?: string;
+  minPlayTime?: string;
+  maxPlayTime?: string;
+  minAge?: string;
+  link?: {
+    type: string;
+    id: string;
+    value: string;
+  }[];
 };
 
 const transformData = (data: response): item => {
@@ -96,6 +132,17 @@ const transformData = (data: response): item => {
     yearPublished: data.yearpublished._attributes.value,
     minPlayers: data.minplayers._attributes.value,
     maxPlayers: data.maxplayers._attributes.value,
+    playingTime: data.playingtime?._attributes.value,
+    minPlayTime: data.minplaytime?._attributes.value,
+    maxPlayTime: data.maxplaytime?._attributes.value,
+    minAge: data.minage?._attributes.value,
+    link: data.link?.map((link) => {
+      return {
+        type: link._attributes.type,
+        id: link._attributes.id,
+        value: link._attributes.value,
+      };
+    }),
   };
 };
 
@@ -104,5 +151,5 @@ export const thing = async (args: args): Promise<item | null> => {
   const { data } = await axios.get("/thing", { params });
 
   if (!data.items.item) return null;
-  return transformData(data);
+  return transformData(data.items.item);
 };
