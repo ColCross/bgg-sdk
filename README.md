@@ -15,6 +15,14 @@ A modern SDK for interacting with the BoardGameGeek (BGG) XMLAPI2, written in Ty
 ## Planned Features
 
 - Support for all BGG XMLAPI2 endpoints (see [documentation](https://boardgamegeek.com/wiki/page/BGG_XML_API2))
+  - Remaining endpoints to implement
+    - family
+    - forumlist
+    - forum
+    - thread
+    - user
+    - guild
+    - plays
 
 ## TODO
 

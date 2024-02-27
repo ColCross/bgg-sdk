@@ -3,16 +3,11 @@ import axios from "~/lib/axios";
 type args = {
   query: string;
   type?: Array<
-    | videogame
-    | boardgame
-    | "rpgitem"
-    | "boardgameaccessory"
-    | "boardgameexpansion"
+    boardgame | boardgameaccessory | boardgameexpansion | rpgitem | videogame
   >;
 };
 
-type params = {
-  query: string;
+type params = Omit<args, "type"> & {
   type?: string;
   exact?: boolean;
 };

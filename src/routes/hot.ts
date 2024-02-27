@@ -3,17 +3,17 @@ import axios from "~/lib/axios";
 type args = {
   type: Array<
     | boardgame
+    | boardgamecompany
+    | boardgameperson
+    | rpg
+    | rpgcompany
+    | rpgperson
     | videogame
-    | "rpg"
-    | "boardgameperson"
-    | "rpgperson"
-    | "boardgamecompany"
-    | "rpgcompany"
-    | "videogamecompany"
+    | videogamecompany
   >;
 };
 
-type params = {
+type params = Omit<args, "type"> & {
   type: string;
 };
 
@@ -40,19 +40,21 @@ type item = {
   thumbnail: string;
 };
 
+const transformData = (data: response): item => {
+  return {
+    id: data._attributes.id,
+    rank: data._attributes.rank,
+    name: data.name._attributes.value,
+    yearpublished: data.yearpublished?._attributes.value,
+    thumbnail: data.thumbnail._attributes.value,
+  };
+};
+
 export const hot = async (args?: args): Promise<item[]> => {
   const params = getParams(args);
   const { data } = await axios.get("/hot", { params });
 
   if (!data.items.item) return [];
 
-  return data.items.item.map((data: response) => {
-    return {
-      id: data._attributes.id,
-      rank: data._attributes.rank,
-      name: data.name._attributes.value,
-      yearpublished: data.yearpublished?._attributes.value,
-      thumbnail: data.thumbnail._attributes.value,
-    };
-  });
+  return data.items.item.map((data: response) => transformData(data));
 };

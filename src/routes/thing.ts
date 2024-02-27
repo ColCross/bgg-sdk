@@ -4,7 +4,14 @@ import axios from "~/lib/axios";
 
 type params = {
   id: string;
-  type: string;
+  type?: Array<
+    | boardgame
+    | boardgameaccessory
+    | boardgameexpansion
+    | rpgissue
+    | rpgitem
+    | videogame
+  >;
   versions: true;
   videos: true;
   stats: true;
@@ -65,12 +72,7 @@ type item = {
   maxPlayers: string;
 };
 
-export const thing = async (params?: params): Promise<item | null> => {
-  const response = await axios.get("/thing", { params });
-  const data: response = response.data.items.item;
-
-  if (!response.data.items.item) return null;
-
+const transformData = (data: response): item => {
   return {
     id: data._attributes.id,
     type: data._attributes.type,
@@ -82,4 +84,12 @@ export const thing = async (params?: params): Promise<item | null> => {
     minPlayers: data.minplayers._attributes.value,
     maxPlayers: data.maxplayers._attributes.value,
   };
+};
+
+export const thing = async (params?: params): Promise<item | null> => {
+  const response = await axios.get("/thing", { params });
+  const data: response = response.data.items.item;
+
+  if (!response.data.items.item) return null;
+  return transformData(data);
 };
