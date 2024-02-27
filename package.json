@@ -14,7 +14,7 @@
   },
   "scripts": {
     "build": "tsup",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "prepare": "husky",
     "format": "prettier --ignore-unknown --write .",
     "lint": "eslint ."
