@@ -144,9 +144,11 @@ export const collection = async (args: args): Promise<item[]> => {
 
   if (!data || !data.items || !data.items.item) return [];
 
-  // The BGG API returns an object instead of an array when there is only one item in the response.
-  // Normalize the response by always returning an array.
-  // Note that this differs from the searchExact function in search.ts, where I think the "exact" parameter implies a single item return.
+  /* 
+    The BGG API returns an object instead of an array when there is only one item in the response.
+    Normalize the response by always returning an array.
+    Note that this differs from the searchExact function in search.ts, where the "exact" parameter implies a single item return.
+  */
   if (!Array.isArray(data.items.item)) {
     return [transformData(data.items.item)];
   }
