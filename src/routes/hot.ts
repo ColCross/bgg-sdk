@@ -26,6 +26,13 @@ const getParams = (args?: args): params | undefined => {
 };
 
 type response = {
+  items: {
+    _attributes: { termsofuse: string };
+    item?: responseBody | responseBody[];
+  };
+};
+
+type responseBody = {
   _attributes: { id: string; rank: string };
   name: { _attributes: { value: string } };
   yearpublished?: { _attributes: { value: string } };
@@ -40,7 +47,7 @@ type item = {
   thumbnail: string;
 };
 
-const transformData = (data: response): item => {
+const transformData = (data: responseBody): item => {
   return {
     id: data._attributes.id,
     rank: data._attributes.rank,
@@ -52,9 +59,15 @@ const transformData = (data: response): item => {
 
 export const hot = async (args?: args): Promise<item[]> => {
   const params = getParams(args);
-  const { data } = await axios.get("/hot", { params });
+  const { data } = await axios.get<response>("/hot", {
+    params,
+  });
 
   if (!data.items.item) return [];
 
-  return data.items.item.map((data: response) => transformData(data));
+  if (Array.isArray(data.items.item)) {
+    return data.items.item.map((data) => transformData(data));
+  }
+
+  return [transformData(data.items.item)];
 };

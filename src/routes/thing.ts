@@ -37,6 +37,15 @@ const getParams = (args: args): params => {
 
 type response = {
   _attributes: {
+    termsofuse: string;
+  };
+  items: {
+    item?: responseBody;
+  };
+};
+
+type responseBody = {
+  _attributes: {
     type: string;
     id: string;
   };
@@ -121,7 +130,7 @@ type item = {
   }[];
 };
 
-const transformData = (data: response): item => {
+const transformData = (data: responseBody): item => {
   return {
     id: data._attributes.id,
     type: data._attributes.type,
@@ -148,8 +157,9 @@ const transformData = (data: response): item => {
 
 export const thing = async (args: args): Promise<item | null> => {
   const params = getParams(args);
-  const { data } = await axios.get("/thing", { params });
+  const { data } = await axios.get<response>("/thing", { params });
 
   if (!data.items.item) return null;
+
   return transformData(data.items.item);
 };

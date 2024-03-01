@@ -43,9 +43,7 @@ type params = Omit<args, "id"> & {
   id?: string;
 };
 
-const getParams = (args: args): params | undefined => {
-  if (!args) return undefined;
-
+const getParams = (args: args): params => {
   return {
     ...args,
     id: args.id?.join(",") || undefined,
@@ -53,6 +51,17 @@ const getParams = (args: args): params | undefined => {
 };
 
 type response = {
+  items: {
+    _attributes: {
+      termsofuse: string;
+      totalitems: string;
+      pubdate: string;
+    };
+    item: responseBody | responseBody[];
+  };
+};
+
+type responseBody = {
   _attributes: {
     objecttype: string;
     objectid: string;
@@ -114,7 +123,7 @@ type item = {
   numplays: number;
 };
 
-const transformData = (data: response): item => {
+const transformData = (data: responseBody): item => {
   return {
     id: data._attributes.objectid,
     collid: data._attributes.collid,
@@ -140,18 +149,15 @@ const transformData = (data: response): item => {
 
 export const collection = async (args: args): Promise<item[]> => {
   const params = getParams(args);
-  const { data } = await axios.get("/collection", { params });
+  const { data } = await axios.get<response>("/collection", {
+    params,
+  });
 
-  if (!data || !data.items || !data.items.item) return [];
+  if (data.items.item === undefined) return [];
 
-  /* 
-    The BGG API returns an object instead of an array when there is only one item in the response.
-    Normalize the response by always returning an array.
-    Note that this differs from the searchExact function in search.ts, where the "exact" parameter implies a single item return.
-  */
-  if (!Array.isArray(data.items.item)) {
-    return [transformData(data.items.item)];
+  if (Array.isArray(data.items.item)) {
+    return data.items.item.map((data) => transformData(data));
   }
 
-  return data.items.item.map((data: response) => transformData(data));
+  return [transformData(data.items.item)];
 };

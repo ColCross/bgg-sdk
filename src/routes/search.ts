@@ -5,21 +5,28 @@ type args = {
   type?: Array<
     boardgame | boardgameaccessory | boardgameexpansion | rpgitem | videogame
   >;
+  exact?: boolean;
 };
 
 type params = Omit<args, "type"> & {
   type?: string;
-  exact?: boolean;
 };
 
 const getParams = (args: args): params => {
   return {
-    query: args.query,
+    ...args,
     type: args.type ? args.type.join(",") : undefined,
   };
 };
 
 type response = {
+  items: {
+    _attributes: { total: string; termsofuse: string };
+    item?: responseBody | responseBody[];
+  };
+};
+
+type responseBody = {
   _attributes: { type: string; id: string };
   name: { _attributes: { type: string; value: string } };
   yearpublished?: { _attributes: { value: string } };
@@ -32,7 +39,7 @@ type item = {
   yearPublished?: string;
 };
 
-const transformData = (data: response): item => {
+const transformData = (data: responseBody): item => {
   return {
     id: data._attributes.id,
     type: data._attributes.type,
@@ -41,33 +48,15 @@ const transformData = (data: response): item => {
   };
 };
 
-/*
-  This file contains two functions:
-  - The search function performs a generic search and always returns an array of items.
-  - The searchExact function performs an exact search and returns a single item or null.
-  These two functions are separated to make return types more consistent.
-*/
-
 export const search = async (args: args): Promise<item[]> => {
   const params = getParams(args);
-  const { data } = await axios.get("/search", { params });
+  const { data } = await axios.get<response>("/search", { params });
 
-  if (!data.items.item) return [];
+  if (data.items.item === undefined) return [];
 
-  return data.items.item.map((data: response) => {
-    return transformData(data);
-  });
-};
+  if (Array.isArray(data.items.item)) {
+    return data.items.item.map((data) => transformData(data));
+  }
 
-export const searchExact = async (args: args): Promise<item | null> => {
-  const params = getParams(args);
-  const { data } = await axios.get("/search", {
-    params: {
-      ...params,
-      exact: true,
-    },
-  });
-
-  if (!data.items.item) return null;
-  return transformData(data.items.item);
+  return [transformData(data.items.item)];
 };
