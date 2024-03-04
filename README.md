@@ -20,7 +20,6 @@ A modern SDK for interacting with the BoardGameGeek (BGG) XMLAPI2, written in Ty
     - forumlist
     - forum
     - thread
-    - user
     - guild
     - plays
 
