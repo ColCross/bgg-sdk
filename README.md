@@ -27,4 +27,3 @@ A modern SDK for interacting with the BoardGameGeek (BGG) XMLAPI2, written in Ty
 
 - Implement remaining endpoints
 - Create unit tests for all endpoints
-- Set up continuous integration and deployment to npm using GitHub Actions
