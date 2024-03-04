@@ -34,7 +34,7 @@ const getParams = (args: Args): Params => {
   };
 };
 
-type LanguageDependencePollResponse = {
+type ApiResponsePollLanguageDependence = {
   _attributes: {
     name: "language_dependence";
     title: string;
@@ -53,7 +53,7 @@ type LanguageDependencePollResponse = {
   };
 };
 
-type SuggestedPlayerAgePollResponse = {
+type ApiResponsePollSuggestedPlayerAge = {
   _attributes: {
     name: "suggested_playerage";
     title: string;
@@ -69,7 +69,7 @@ type SuggestedPlayerAgePollResponse = {
   };
 };
 
-type NumPlayersPollResponse = {
+type ApiResponsePollNumPlayers = {
   _attributes: {
     name: "suggested_numplayers";
     title: string;
@@ -88,13 +88,13 @@ type NumPlayersPollResponse = {
   }[];
 };
 
-type PollResponse = Array<
-  | LanguageDependencePollResponse
-  | NumPlayersPollResponse
-  | SuggestedPlayerAgePollResponse
+type ApiResponsePolls = Array<
+  | ApiResponsePollLanguageDependence
+  | ApiResponsePollNumPlayers
+  | ApiResponsePollSuggestedPlayerAge
 >;
 
-type NameResponse = {
+type ApiResponseName = {
   _attributes: {
     type: string;
     sortindex: string;
@@ -102,7 +102,7 @@ type NameResponse = {
   };
 };
 
-type LinkResponse = {
+type ApiResponseLink = {
   _attributes: {
     type: string;
     id: string;
@@ -110,70 +110,70 @@ type LinkResponse = {
   };
 };
 
-type ResponseBody = {
+type ApiResponseBody = {
   _attributes: {
     type: string;
     id: string;
   };
-  thumbnail?: {
+  thumbnail: {
     _text: string;
   };
-  image?: {
+  image: {
     _text: string;
   };
-  name?: NameResponse | NameResponse[];
-  description?: {
+  name: ApiResponseName | ApiResponseName[];
+  description: {
     _text: string;
   };
-  yearpublished?: {
+  yearpublished: {
     _attributes: {
       value: string;
     };
   };
-  minplayers?: {
+  minplayers: {
     _attributes: {
       value: string;
     };
   };
-  maxplayers?: {
+  maxplayers: {
     _attributes: {
       value: string;
     };
   };
-  playingtime?: {
+  playingtime: {
     _attributes: {
       value: string;
     };
   };
-  minplaytime?: {
+  minplaytime: {
     _attributes: {
       value: string;
     };
   };
-  maxplaytime?: {
+  maxplaytime: {
     _attributes: {
       value: string;
     };
   };
-  minage?: {
+  minage: {
     _attributes: {
       value: string;
     };
   };
-  link?: LinkResponse | LinkResponse[];
-  poll?: PollResponse;
+  link: ApiResponseLink | ApiResponseLink[];
+  poll?: ApiResponsePolls;
 };
 
-type Response = {
+type ApiResponse = {
   items: {
     _attributes: {
       termsofuse: string;
     };
-    item?: ResponseBody | ResponseBody[];
+    item?: ApiResponseBody | ApiResponseBody[];
   };
 };
 
-type LanguageDependencePoll = {
+type PollLanguageDependence = {
   name: string;
   title: string;
   totalvotes: string;
@@ -184,7 +184,7 @@ type LanguageDependencePoll = {
   }[];
 };
 
-type SuggestedPlayerAgePoll = {
+type PollSuggestedPlayerAge = {
   name: string;
   title: string;
   totalvotes: string;
@@ -194,7 +194,7 @@ type SuggestedPlayerAgePoll = {
   }[];
 };
 
-type NumPlayersPoll = {
+type PollNumPlayers = {
   name: string;
   title: string;
   totalvotes: string;
@@ -207,39 +207,46 @@ type NumPlayersPoll = {
   }[];
 };
 
-type Poll = Array<
-  LanguageDependencePoll | NumPlayersPoll | SuggestedPlayerAgePoll
+type Polls = Array<
+  PollLanguageDependence | PollNumPlayers | PollSuggestedPlayerAge
 >;
 
 type Item = {
   id: string;
   type: string;
-  thumbnail?: string;
-  image?: string;
-  name?: {
+  thumbnail: string;
+  image: string;
+  names: {
     type: string;
     sortindex: string;
     value: string;
   }[];
-  description?: string;
-  yearPublished?: string;
-  minPlayers?: string;
-  maxPlayers?: string;
-  playingTime?: string;
-  minPlayTime?: string;
-  maxPlayTime?: string;
-  minAge?: string;
-  link: {
+  description: string;
+  yearPublished: string;
+  minPlayers: string;
+  maxPlayers: string;
+  playingTime: string;
+  minPlayTime: string;
+  maxPlayTime: string;
+  minAge: string;
+  links: {
     type: string;
     id: string;
     value: string;
   }[];
-  poll: Poll;
+  polls: Polls;
 };
 
-const transformLanguageDependencePoll = (
-  poll: LanguageDependencePollResponse,
-): LanguageDependencePoll => {
+type Payload = {
+  attributes: {
+    termsofuse: string;
+  };
+  items: Item[];
+};
+
+const transformPollLanguageDependence = (
+  poll: ApiResponsePollLanguageDependence,
+): PollLanguageDependence => {
   return {
     name: poll._attributes.name,
     title: poll._attributes.title,
@@ -254,9 +261,9 @@ const transformLanguageDependencePoll = (
   };
 };
 
-const transformSuggestedPlayerAgePoll = (
-  poll: SuggestedPlayerAgePollResponse,
-): SuggestedPlayerAgePoll => {
+const transformPollSuggestedPlayerAge = (
+  poll: ApiResponsePollSuggestedPlayerAge,
+): PollSuggestedPlayerAge => {
   return {
     name: poll._attributes.name,
     title: poll._attributes.title,
@@ -270,9 +277,9 @@ const transformSuggestedPlayerAgePoll = (
   };
 };
 
-const transformSuggestedNumPlayersPoll = (
-  poll: NumPlayersPollResponse,
-): NumPlayersPoll => {
+const transformPollSuggestedNumPlayers = (
+  poll: ApiResponsePollNumPlayers,
+): PollNumPlayers => {
   return {
     name: poll._attributes.name,
     title: poll._attributes.title,
@@ -292,30 +299,32 @@ const transformSuggestedNumPlayersPoll = (
 };
 
 // TODO: Figure out why TS doesn't recognize the discriminated union and requires a type assertion
-const transformPoll = (poll: PollResponse): Poll => {
-  const transformedPolls: Poll = [];
+const transformPoll = (apiPolls: ApiResponsePolls): Polls => {
+  const polls: Polls = [];
 
-  poll.forEach((poll) => {
-    switch (poll._attributes.name) {
+  apiPolls.forEach((apiPoll) => {
+    switch (apiPoll._attributes.name) {
       case "language_dependence": {
-        transformedPolls.push(
-          transformLanguageDependencePoll(
-            poll as LanguageDependencePollResponse,
+        polls.push(
+          transformPollLanguageDependence(
+            apiPoll as ApiResponsePollLanguageDependence,
           ),
         );
         break;
       }
       case "suggested_playerage": {
-        transformedPolls.push(
-          transformSuggestedPlayerAgePoll(
-            poll as SuggestedPlayerAgePollResponse,
+        polls.push(
+          transformPollSuggestedPlayerAge(
+            apiPoll as ApiResponsePollSuggestedPlayerAge,
           ),
         );
         break;
       }
       case "suggested_numplayers": {
-        transformedPolls.push(
-          transformSuggestedNumPlayersPoll(poll as NumPlayersPollResponse),
+        polls.push(
+          transformPollSuggestedNumPlayers(
+            apiPoll as ApiResponsePollNumPlayers,
+          ),
         );
         break;
       }
@@ -325,16 +334,16 @@ const transformPoll = (poll: PollResponse): Poll => {
     }
   });
 
-  return transformedPolls;
+  return polls;
 };
 
-const transformData = (data: ResponseBody): Item => {
+const transformData = (data: ApiResponseBody): Item => {
   return {
     id: data._attributes.id,
     type: data._attributes.type,
     thumbnail: data.thumbnail?._text,
     image: data.image?._text,
-    name: enforceArray(data.name).map((name) => {
+    names: enforceArray(data.name).map((name) => {
       return {
         type: name._attributes.type ?? "",
         sortindex: name._attributes.sortindex,
@@ -349,20 +358,25 @@ const transformData = (data: ResponseBody): Item => {
     minPlayTime: data.minplaytime?._attributes.value,
     maxPlayTime: data.maxplaytime?._attributes.value,
     minAge: data.minage?._attributes.value,
-    link: enforceArray(data.link).map((link) => {
+    links: enforceArray(data.link).map((link) => {
       return {
         type: link._attributes.type,
         id: link._attributes.id,
         value: link._attributes.value,
       };
     }),
-    poll: transformPoll(enforceArray(data.poll)),
+    polls: transformPoll(enforceArray(data.poll)),
   };
 };
 
-export const thing = async (args: Args): Promise<Item[]> => {
+export const thing = async (args: Args): Promise<Payload> => {
   const params = getParams(args);
-  const { data } = await axios.get<Response>("/thing", { params });
+  const { data } = await axios.get<ApiResponse>("/thing", { params });
 
-  return enforceArray(data.items.item).map((data) => transformData(data));
+  return {
+    attributes: {
+      termsofuse: data.items._attributes.termsofuse,
+    },
+    items: enforceArray(data.items.item).map((data) => transformData(data)),
+  };
 };

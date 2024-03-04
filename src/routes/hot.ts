@@ -26,18 +26,18 @@ const getParams = (args?: Args): Params | undefined => {
   };
 };
 
-type Response = {
-  items: {
-    _attributes: { termsofuse: string };
-    item?: ResponseBody | ResponseBody[];
-  };
-};
-
-type ResponseBody = {
+type ApiResponseBody = {
   _attributes: { id: string; rank: string };
   name: { _attributes: { value: string } };
   yearpublished: { _attributes: { value: string } };
   thumbnail: { _attributes: { value: string } };
+};
+
+type ApiResponse = {
+  items: {
+    _attributes: { termsofuse: string };
+    item?: ApiResponseBody | ApiResponseBody[];
+  };
 };
 
 type Item = {
@@ -48,7 +48,14 @@ type Item = {
   thumbnail: string;
 };
 
-const transformData = (data: ResponseBody): Item => {
+type Payload = {
+  attributes: {
+    termsofuse: string;
+  };
+  items: Item[];
+};
+
+const transformData = (data: ApiResponseBody): Item => {
   return {
     id: data._attributes.id,
     rank: data._attributes.rank,
@@ -58,11 +65,16 @@ const transformData = (data: ResponseBody): Item => {
   };
 };
 
-export const hot = async (args?: Args): Promise<Item[]> => {
+export const hot = async (args?: Args): Promise<Payload> => {
   const params = getParams(args);
-  const { data } = await axios.get<Response>("/hot", {
+  const { data } = await axios.get<ApiResponse>("/hot", {
     params,
   });
 
-  return enforceArray(data.items.item).map((data) => transformData(data));
+  return {
+    attributes: {
+      termsofuse: data.items._attributes.termsofuse,
+    },
+    items: enforceArray(data.items.item).map((data) => transformData(data)),
+  };
 };
