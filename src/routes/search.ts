@@ -1,7 +1,7 @@
 import { axios } from "~/lib/axios";
 import { enforceArray } from "~/lib/helpers";
 
-type args = {
+type Args = {
   query: string;
   type?: Array<
     boardgame | boardgameaccessory | boardgameexpansion | rpgitem | videogame
@@ -9,38 +9,38 @@ type args = {
   exact?: boolean;
 };
 
-type params = Omit<args, "type"> & {
+type Params = Omit<Args, "type"> & {
   type?: string;
 };
 
-const getParams = (args: args): params => {
+const getParams = (args: Args): Params => {
   return {
     ...args,
     type: args.type ? args.type.join(",") : undefined,
   };
 };
 
-type response = {
+type Response = {
   items: {
     _attributes: { total: string; termsofuse: string };
-    item?: responseBody | responseBody[];
+    item?: ResponseBody | ResponseBody[];
   };
 };
 
-type responseBody = {
+type ResponseBody = {
   _attributes: { type: string; id: string };
   name: { _attributes: { type: string; value: string } };
   yearpublished?: { _attributes: { value: string } };
 };
 
-type item = {
+type Item = {
   id: string;
   type: string;
   name: string;
   yearPublished?: string;
 };
 
-const transformData = (data: responseBody): item => {
+const transformData = (data: ResponseBody): Item => {
   return {
     id: data._attributes.id,
     type: data._attributes.type,
@@ -49,9 +49,9 @@ const transformData = (data: responseBody): item => {
   };
 };
 
-export const search = async (args: args): Promise<item[]> => {
+export const search = async (args: Args): Promise<Item[]> => {
   const params = getParams(args);
-  const { data } = await axios.get<response>("/search", { params });
+  const { data } = await axios.get<Response>("/search", { params });
 
-  return enforceArray(data.items.item).map((data) => transformData(data));
+  return enforceArray(data.items?.item).map((data) => transformData(data));
 };

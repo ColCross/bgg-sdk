@@ -1,7 +1,7 @@
 import { axios } from "~/lib/axios";
 import { enforceArray } from "~/lib/helpers";
 
-type args = {
+type Args = {
   type: Array<
     | boardgame
     | boardgamecompany
@@ -14,11 +14,11 @@ type args = {
   >;
 };
 
-type params = Omit<args, "type"> & {
+type Params = Omit<Args, "type"> & {
   type: string;
 };
 
-const getParams = (args?: args): params | undefined => {
+const getParams = (args?: Args): Params | undefined => {
   if (!args) return undefined;
 
   return {
@@ -26,21 +26,21 @@ const getParams = (args?: args): params | undefined => {
   };
 };
 
-type response = {
+type Response = {
   items: {
     _attributes: { termsofuse: string };
-    item?: responseBody | responseBody[];
+    item?: ResponseBody | ResponseBody[];
   };
 };
 
-type responseBody = {
+type ResponseBody = {
   _attributes: { id: string; rank: string };
   name: { _attributes: { value: string } };
   yearpublished?: { _attributes: { value: string } };
   thumbnail: { _attributes: { value: string } };
 };
 
-type item = {
+type Item = {
   id: string;
   rank: string;
   name: string;
@@ -48,7 +48,7 @@ type item = {
   thumbnail: string;
 };
 
-const transformData = (data: responseBody): item => {
+const transformData = (data: ResponseBody): Item => {
   return {
     id: data._attributes.id,
     rank: data._attributes.rank,
@@ -58,11 +58,11 @@ const transformData = (data: responseBody): item => {
   };
 };
 
-export const hot = async (args?: args): Promise<item[]> => {
+export const hot = async (args?: Args): Promise<Item[]> => {
   const params = getParams(args);
-  const { data } = await axios.get<response>("/hot", {
+  const { data } = await axios.get<Response>("/hot", {
     params,
   });
 
-  return enforceArray(data.items.item).map((data) => transformData(data));
+  return enforceArray(data.items?.item).map((data) => transformData(data));
 };

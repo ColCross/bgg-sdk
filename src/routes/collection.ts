@@ -1,7 +1,7 @@
 import { axios } from "~/lib/axios";
 import { enforceArray } from "~/lib/helpers";
 
-type args = {
+type Args = {
   username: string;
   version?: true;
   subtype?:
@@ -40,29 +40,29 @@ type args = {
   modifiedsince?: string;
 };
 
-type params = Omit<args, "id"> & {
+type Params = Omit<Args, "id"> & {
   id?: string;
 };
 
-const getParams = (args: args): params => {
+const getParams = (args: Args): Params => {
   return {
     ...args,
     id: args.id?.join(",") || undefined,
   };
 };
 
-type response = {
+type Response = {
   items: {
     _attributes: {
       termsofuse: string;
       totalitems: string;
       pubdate: string;
     };
-    item: responseBody | responseBody[];
+    item: ResponseBody | ResponseBody[];
   };
 };
 
-type responseBody = {
+type ResponseBody = {
   _attributes: {
     objecttype: string;
     objectid: string;
@@ -102,7 +102,7 @@ type responseBody = {
   };
 };
 
-type item = {
+type Item = {
   id: string;
   collid: string;
   type: string;
@@ -124,7 +124,7 @@ type item = {
   numplays: number;
 };
 
-const transformData = (data: responseBody): item => {
+const transformData = (data: ResponseBody): Item => {
   return {
     id: data._attributes.objectid,
     collid: data._attributes.collid,
@@ -148,11 +148,11 @@ const transformData = (data: responseBody): item => {
   };
 };
 
-export const collection = async (args: args): Promise<item[]> => {
+export const collection = async (args: Args): Promise<Item[]> => {
   const params = getParams(args);
-  const { data } = await axios.get<response>("/collection", {
+  const { data } = await axios.get<Response>("/collection", {
     params,
   });
 
-  return enforceArray(data.items.item).map((data) => transformData(data));
+  return enforceArray(data.items?.item).map((data) => transformData(data));
 };

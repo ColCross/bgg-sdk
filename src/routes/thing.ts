@@ -1,10 +1,8 @@
 import { axios } from "~/lib/axios";
 import { enforceArray } from "~/lib/helpers";
 
-// TODO: Excluding poll data for now
-
-type args = {
-  id: Array<string>;
+type Args = {
+  id: string[];
   type?: Array<
     | boardgame
     | boardgameaccessory
@@ -23,12 +21,12 @@ type args = {
   pagesize?: number;
 };
 
-type params = Omit<args, "id" | "type"> & {
+type Params = Omit<Args, "id" | "type"> & {
   id: string;
   type?: string;
 };
 
-const getParams = (args: args): params => {
+const getParams = (args: Args): Params => {
   return {
     ...args,
     id: args.id.join(","),
@@ -36,32 +34,7 @@ const getParams = (args: args): params => {
   };
 };
 
-type response = {
-  items: {
-    _attributes: {
-      termsofuse: string;
-    };
-    item?: responseBody | responseBody[];
-  };
-};
-
-type name = {
-  _attributes: {
-    type: string;
-    sortindex: string;
-    value: string;
-  };
-};
-
-type link = {
-  _attributes: {
-    type: string;
-    id: string;
-    value: string;
-  };
-};
-
-type languageDependencePollResponse = {
+type LanguageDependencePollResponse = {
   _attributes: {
     name: "language_dependence";
     title: string;
@@ -80,18 +53,7 @@ type languageDependencePollResponse = {
   };
 };
 
-type languageDependencePoll = {
-  name: string;
-  title: string;
-  totalvotes: string;
-  results: {
-    level: string;
-    value: string;
-    numvotes: string;
-  }[];
-};
-
-type suggestedPlayerAgePollResponse = {
+type SuggestedPlayerAgePollResponse = {
   _attributes: {
     name: "suggested_playerage";
     title: string;
@@ -107,17 +69,7 @@ type suggestedPlayerAgePollResponse = {
   };
 };
 
-type suggestedPlayerAgePoll = {
-  name: string;
-  title: string;
-  totalvotes: string;
-  results: {
-    value: string;
-    numvotes: string;
-  }[];
-};
-
-type numPlayersPollResponse = {
+type NumPlayersPollResponse = {
   _attributes: {
     name: "suggested_numplayers";
     title: string;
@@ -136,25 +88,29 @@ type numPlayersPollResponse = {
   }[];
 };
 
-type numPlayersPoll = {
-  name: string;
-  title: string;
-  totalvotes: string;
-  results: {
-    numplayers: string;
-    result: {
-      value: string;
-      numvotes: string;
-    }[];
-  }[];
+type PollResponse = Array<
+  | LanguageDependencePollResponse
+  | NumPlayersPollResponse
+  | SuggestedPlayerAgePollResponse
+>;
+
+type NameResponse = {
+  _attributes: {
+    type: string;
+    sortindex: string;
+    value: string;
+  };
 };
 
-type PollResponse =
-  | languageDependencePollResponse
-  | numPlayersPollResponse
-  | suggestedPlayerAgePollResponse;
+type LinkResponse = {
+  _attributes: {
+    type: string;
+    id: string;
+    value: string;
+  };
+};
 
-type responseBody = {
+type ResponseBody = {
   _attributes: {
     type: string;
     id: string;
@@ -165,7 +121,7 @@ type responseBody = {
   image?: {
     _text: string;
   };
-  name?: name | name[];
+  name?: NameResponse | NameResponse[];
   description?: {
     _text: string;
   };
@@ -204,13 +160,58 @@ type responseBody = {
       value: string;
     };
   };
-  link?: link | link[];
-  poll?: PollResponse[];
+  link?: LinkResponse | LinkResponse[];
+  poll?: PollResponse;
 };
 
-type Poll = languageDependencePoll | numPlayersPoll | suggestedPlayerAgePoll;
+type Response = {
+  items: {
+    _attributes: {
+      termsofuse: string;
+    };
+    item?: ResponseBody | ResponseBody[];
+  };
+};
 
-type item = {
+type LanguageDependencePoll = {
+  name: string;
+  title: string;
+  totalvotes: string;
+  results: {
+    level: string;
+    value: string;
+    numvotes: string;
+  }[];
+};
+
+type SuggestedPlayerAgePoll = {
+  name: string;
+  title: string;
+  totalvotes: string;
+  results: {
+    value: string;
+    numvotes: string;
+  }[];
+};
+
+type NumPlayersPoll = {
+  name: string;
+  title: string;
+  totalvotes: string;
+  results: {
+    numplayers: string;
+    result: {
+      value: string;
+      numvotes: string;
+    }[];
+  }[];
+};
+
+type Poll = Array<
+  LanguageDependencePoll | NumPlayersPoll | SuggestedPlayerAgePoll
+>;
+
+type Item = {
   id: string;
   type: string;
   thumbnail?: string;
@@ -233,12 +234,12 @@ type item = {
     id: string;
     value: string;
   }[];
-  poll: Poll[];
+  poll: Poll;
 };
 
 const transformLanguageDependencePoll = (
-  poll: languageDependencePollResponse,
-): languageDependencePoll => {
+  poll: LanguageDependencePollResponse,
+): LanguageDependencePoll => {
   return {
     name: poll._attributes.name,
     title: poll._attributes.title,
@@ -254,8 +255,8 @@ const transformLanguageDependencePoll = (
 };
 
 const transformSuggestedPlayerAgePoll = (
-  poll: suggestedPlayerAgePollResponse,
-): suggestedPlayerAgePoll => {
+  poll: SuggestedPlayerAgePollResponse,
+): SuggestedPlayerAgePoll => {
   return {
     name: poll._attributes.name,
     title: poll._attributes.title,
@@ -270,8 +271,8 @@ const transformSuggestedPlayerAgePoll = (
 };
 
 const transformSuggestedNumPlayersPoll = (
-  poll: numPlayersPollResponse,
-): numPlayersPoll => {
+  poll: NumPlayersPollResponse,
+): NumPlayersPoll => {
   return {
     name: poll._attributes.name,
     title: poll._attributes.title,
@@ -290,14 +291,16 @@ const transformSuggestedNumPlayersPoll = (
   };
 };
 
-const transformPoll = (poll: PollResponse[]): Poll[] => {
-  const transformedPolls: Poll[] = [];
+// TODO: Figure out why TS doesn't recognize the discriminated union and requires a type assertion
+const transformPoll = (poll: PollResponse): Poll => {
+  const transformedPolls: Poll = [];
+
   poll.forEach((poll) => {
     switch (poll._attributes.name) {
       case "language_dependence": {
         transformedPolls.push(
           transformLanguageDependencePoll(
-            poll as languageDependencePollResponse,
+            poll as LanguageDependencePollResponse,
           ),
         );
         break;
@@ -305,14 +308,14 @@ const transformPoll = (poll: PollResponse[]): Poll[] => {
       case "suggested_playerage": {
         transformedPolls.push(
           transformSuggestedPlayerAgePoll(
-            poll as suggestedPlayerAgePollResponse,
+            poll as SuggestedPlayerAgePollResponse,
           ),
         );
         break;
       }
       case "suggested_numplayers": {
         transformedPolls.push(
-          transformSuggestedNumPlayersPoll(poll as numPlayersPollResponse),
+          transformSuggestedNumPlayersPoll(poll as NumPlayersPollResponse),
         );
         break;
       }
@@ -325,7 +328,7 @@ const transformPoll = (poll: PollResponse[]): Poll[] => {
   return transformedPolls;
 };
 
-const transformData = (data: responseBody): item => {
+const transformData = (data: ResponseBody): Item => {
   return {
     id: data._attributes.id,
     type: data._attributes.type,
@@ -357,11 +360,9 @@ const transformData = (data: responseBody): item => {
   };
 };
 
-export const thing = async (args: args): Promise<item[]> => {
+export const thing = async (args: Args): Promise<Item[]> => {
   const params = getParams(args);
-  const { data } = await axios.get<response>("/thing", { params });
+  const { data } = await axios.get<Response>("/thing", { params });
 
-  if (!data.items.item) return [];
-
-  return enforceArray(data.items.item).map((data) => transformData(data));
+  return enforceArray(data.items?.item).map((data) => transformData(data));
 };
