@@ -61,6 +61,99 @@ type link = {
   };
 };
 
+type languageDependencePollResponse = {
+  _attributes: {
+    name: "language_dependence";
+    title: string;
+    totalvotes: string;
+  };
+  results: {
+    result: [
+      {
+        _attributes: {
+          level: string;
+          value: string;
+          numvotes: string;
+        };
+      },
+    ];
+  };
+};
+
+type languageDependencePoll = {
+  name: string;
+  title: string;
+  totalvotes: string;
+  results: {
+    level: string;
+    value: string;
+    numvotes: string;
+  }[];
+};
+
+type suggestedPlayerAgePollResponse = {
+  _attributes: {
+    name: "suggested_playerage";
+    title: string;
+    totalvotes: string;
+  };
+  results: {
+    result: {
+      _attributes: {
+        value: string;
+        numvotes: string;
+      };
+    }[];
+  };
+};
+
+type suggestedPlayerAgePoll = {
+  name: string;
+  title: string;
+  totalvotes: string;
+  results: {
+    value: string;
+    numvotes: string;
+  }[];
+};
+
+type numPlayersPollResponse = {
+  _attributes: {
+    name: "suggested_numplayers";
+    title: string;
+    totalvotes: string;
+  };
+  results: {
+    _attributes: {
+      numplayers: string;
+    };
+    result: {
+      _attributes: {
+        value: string;
+        numvotes: string;
+      };
+    }[];
+  }[];
+};
+
+type numPlayersPoll = {
+  name: string;
+  title: string;
+  totalvotes: string;
+  results: {
+    numplayers: string;
+    result: {
+      value: string;
+      numvotes: string;
+    }[];
+  }[];
+};
+
+type PollResponse =
+  | languageDependencePollResponse
+  | numPlayersPollResponse
+  | suggestedPlayerAgePollResponse;
+
 type responseBody = {
   _attributes: {
     type: string;
@@ -112,7 +205,10 @@ type responseBody = {
     };
   };
   link?: link | link[];
+  poll?: PollResponse[];
 };
+
+type Poll = languageDependencePoll | numPlayersPoll | suggestedPlayerAgePoll;
 
 type item = {
   id: string;
@@ -132,11 +228,101 @@ type item = {
   minPlayTime?: string;
   maxPlayTime?: string;
   minAge?: string;
-  link?: {
+  link: {
     type: string;
     id: string;
     value: string;
   }[];
+  poll: Poll[];
+};
+
+const transformLanguageDependencePoll = (
+  poll: languageDependencePollResponse,
+): languageDependencePoll => {
+  return {
+    name: poll._attributes.name,
+    title: poll._attributes.title,
+    totalvotes: poll._attributes.totalvotes,
+    results: poll.results.result.map((result) => {
+      return {
+        level: result._attributes.level,
+        value: result._attributes.value,
+        numvotes: result._attributes.numvotes,
+      };
+    }),
+  };
+};
+
+const transformSuggestedPlayerAgePoll = (
+  poll: suggestedPlayerAgePollResponse,
+): suggestedPlayerAgePoll => {
+  return {
+    name: poll._attributes.name,
+    title: poll._attributes.title,
+    totalvotes: poll._attributes.totalvotes,
+    results: poll.results.result.map((result) => {
+      return {
+        value: result._attributes.value,
+        numvotes: result._attributes.numvotes,
+      };
+    }),
+  };
+};
+
+const transformSuggestedNumPlayersPoll = (
+  poll: numPlayersPollResponse,
+): numPlayersPoll => {
+  return {
+    name: poll._attributes.name,
+    title: poll._attributes.title,
+    totalvotes: poll._attributes.totalvotes,
+    results: poll.results.map((result) => {
+      return {
+        numplayers: result._attributes.numplayers,
+        result: result.result.map((result) => {
+          return {
+            value: result._attributes.value,
+            numvotes: result._attributes.numvotes,
+          };
+        }),
+      };
+    }),
+  };
+};
+
+const transformPoll = (poll: PollResponse[]): Poll[] => {
+  const transformedPolls: Poll[] = [];
+  poll.forEach((poll) => {
+    switch (poll._attributes.name) {
+      case "language_dependence": {
+        transformedPolls.push(
+          transformLanguageDependencePoll(
+            poll as languageDependencePollResponse,
+          ),
+        );
+        break;
+      }
+      case "suggested_playerage": {
+        transformedPolls.push(
+          transformSuggestedPlayerAgePoll(
+            poll as suggestedPlayerAgePollResponse,
+          ),
+        );
+        break;
+      }
+      case "suggested_numplayers": {
+        transformedPolls.push(
+          transformSuggestedNumPlayersPoll(poll as numPlayersPollResponse),
+        );
+        break;
+      }
+      default: {
+        return null;
+      }
+    }
+  });
+
+  return transformedPolls;
 };
 
 const transformData = (data: responseBody): item => {
@@ -167,6 +353,7 @@ const transformData = (data: responseBody): item => {
         value: link._attributes.value,
       };
     }),
+    poll: transformPoll(enforceArray(data.poll)),
   };
 };
 
