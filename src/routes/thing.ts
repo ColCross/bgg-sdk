@@ -1,4 +1,5 @@
 import axios from "~/lib/axios";
+import { enforceArray } from "~/lib/helpers";
 
 // TODO: Excluding poll data for now
 
@@ -12,14 +13,14 @@ type args = {
     | rpgitem
     | videogame
   >;
-  versions: true;
-  videos: true;
-  stats: true;
-  marketplace: true;
-  comments: true;
-  ratingcomments: true;
-  page: number;
-  pagesize: number;
+  versions?: true;
+  videos?: true;
+  stats?: true;
+  marketplace?: true;
+  comments?: true;
+  ratingcomments?: true;
+  page?: number;
+  pagesize?: number;
 };
 
 type params = Omit<args, "id" | "type"> & {
@@ -36,11 +37,27 @@ const getParams = (args: args): params => {
 };
 
 type response = {
-  _attributes: {
-    termsofuse: string;
-  };
   items: {
-    item?: responseBody;
+    _attributes: {
+      termsofuse: string;
+    };
+    item?: responseBody | responseBody[];
+  };
+};
+
+type name = {
+  _attributes: {
+    type: string;
+    sortindex: string;
+    value: string;
+  };
+};
+
+type link = {
+  _attributes: {
+    type: string;
+    id: string;
+    value: string;
   };
 };
 
@@ -49,33 +66,27 @@ type responseBody = {
     type: string;
     id: string;
   };
-  thumbnail: {
+  thumbnail?: {
     _text: string;
   };
-  image: {
+  image?: {
     _text: string;
   };
-  name: {
-    _attributes: {
-      type: string;
-      sortindex: string;
-      value: string;
-    };
-  }[];
-  description: {
+  name?: name | name[];
+  description?: {
     _text: string;
   };
-  yearpublished: {
+  yearpublished?: {
     _attributes: {
       value: string;
     };
   };
-  minplayers: {
+  minplayers?: {
     _attributes: {
       value: string;
     };
   };
-  maxplayers: {
+  maxplayers?: {
     _attributes: {
       value: string;
     };
@@ -100,25 +111,23 @@ type responseBody = {
       value: string;
     };
   };
-  link?: {
-    _attributes: {
-      type: string;
-      id: string;
-      value: string;
-    };
-  }[];
+  link?: link | link[];
 };
 
 type item = {
   id: string;
   type: string;
-  thumbnail: string;
-  image: string;
-  name: string;
-  description: string;
-  yearPublished: string;
-  minPlayers: string;
-  maxPlayers: string;
+  thumbnail?: string;
+  image?: string;
+  name?: {
+    type: string;
+    sortindex: string;
+    value: string;
+  }[];
+  description?: string;
+  yearPublished?: string;
+  minPlayers?: string;
+  maxPlayers?: string;
   playingTime?: string;
   minPlayTime?: string;
   maxPlayTime?: string;
@@ -134,18 +143,24 @@ const transformData = (data: responseBody): item => {
   return {
     id: data._attributes.id,
     type: data._attributes.type,
-    thumbnail: data.thumbnail._text,
-    image: data.image._text,
-    name: data.name[0]._attributes.value,
-    description: data.description._text,
-    yearPublished: data.yearpublished._attributes.value,
-    minPlayers: data.minplayers._attributes.value,
-    maxPlayers: data.maxplayers._attributes.value,
+    thumbnail: data.thumbnail?._text,
+    image: data.image?._text,
+    name: enforceArray(data.name).map((name) => {
+      return {
+        type: name._attributes.type ?? "",
+        sortindex: name._attributes.sortindex,
+        value: name._attributes.value,
+      };
+    }),
+    description: data.description?._text,
+    yearPublished: data.yearpublished?._attributes.value,
+    minPlayers: data.minplayers?._attributes.value,
+    maxPlayers: data.maxplayers?._attributes.value,
     playingTime: data.playingtime?._attributes.value,
     minPlayTime: data.minplaytime?._attributes.value,
     maxPlayTime: data.maxplaytime?._attributes.value,
     minAge: data.minage?._attributes.value,
-    link: data.link?.map((link) => {
+    link: enforceArray(data.link).map((link) => {
       return {
         type: link._attributes.type,
         id: link._attributes.id,
@@ -155,11 +170,11 @@ const transformData = (data: responseBody): item => {
   };
 };
 
-export const thing = async (args: args): Promise<item | null> => {
+export const thing = async (args: args): Promise<item[]> => {
   const params = getParams(args);
   const { data } = await axios.get<response>("/thing", { params });
 
-  if (!data.items.item) return null;
+  if (!data.items.item) return [];
 
-  return transformData(data.items.item);
+  return enforceArray(data.items.item).map((data) => transformData(data));
 };
