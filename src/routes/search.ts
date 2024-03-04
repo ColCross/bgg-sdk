@@ -1,4 +1,5 @@
-import axios from "~/lib/axios";
+import { axios } from "~/lib/axios";
+import { enforceArray } from "~/lib/helpers";
 
 type args = {
   query: string;
@@ -52,11 +53,5 @@ export const search = async (args: args): Promise<item[]> => {
   const params = getParams(args);
   const { data } = await axios.get<response>("/search", { params });
 
-  if (data.items.item === undefined) return [];
-
-  if (Array.isArray(data.items.item)) {
-    return data.items.item.map((data) => transformData(data));
-  }
-
-  return [transformData(data.items.item)];
+  return enforceArray(data.items.item).map((data) => transformData(data));
 };

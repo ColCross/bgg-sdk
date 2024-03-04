@@ -1,4 +1,4 @@
-import axios from "~/lib/axios";
+import { axios } from "~/lib/axios";
 import { enforceArray } from "~/lib/helpers";
 
 // TODO: Excluding poll data for now

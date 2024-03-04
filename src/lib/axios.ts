@@ -1,17 +1,17 @@
-import axios from "axios";
+import axiosBase from "axios";
 import axiosRetry from "axios-retry";
 import convert from "xml-js";
 
-const axiosInstance = axios.create({
+export const axios = axiosBase.create({
   baseURL: "https://boardgamegeek.com/xmlapi2/",
 });
 
-axiosRetry(axiosInstance, {
+axiosRetry(axios, {
   retries: 3,
   retryDelay: axiosRetry.exponentialDelay,
 });
 
-axiosInstance.interceptors.response.use(
+axios.interceptors.response.use(
   (response) => {
     try {
       const jsonData = convert.xml2js(response.data, { compact: true });
@@ -25,5 +25,3 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(`Unexpected error calling BGG API: ${error.stack}`);
   },
 );
-
-export default axiosInstance;
