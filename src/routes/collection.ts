@@ -51,18 +51,7 @@ const getParams = (args: Args): Params => {
   };
 };
 
-type Response = {
-  items?: {
-    _attributes: {
-      termsofuse: string;
-      totalitems: string;
-      pubdate: string;
-    };
-    item: ResponseBody | ResponseBody[];
-  };
-};
-
-type ResponseBody = {
+type ApiResponseBody = {
   _attributes: {
     objecttype: string;
     objectid: string;
@@ -102,6 +91,17 @@ type ResponseBody = {
   };
 };
 
+type ApiResponse = {
+  items?: {
+    _attributes: {
+      termsofuse: string;
+      totalitems: string;
+      pubdate: string;
+    };
+    item: ApiResponseBody | ApiResponseBody[];
+  };
+};
+
 type Item = {
   id: string;
   collId: string;
@@ -124,7 +124,16 @@ type Item = {
   numPlays: number;
 };
 
-const transformData = (data: ResponseBody): Item => {
+type Payload = {
+  attributes: {
+    termsOfUse: string;
+    totalItems: string;
+    pubDate: string;
+  };
+  items: Item[];
+};
+
+const transformData = (data: ApiResponseBody): Item => {
   return {
     id: data._attributes.objectid,
     collId: data._attributes.collid,
@@ -134,25 +143,36 @@ const transformData = (data: ResponseBody): Item => {
     image: data.image._text,
     thumbnail: data.thumbnail._text,
     status: {
-      own: Boolean(data.status._attributes.own),
-      prevOwned: Boolean(data.status._attributes.prevowned),
-      forTrade: Boolean(data.status._attributes.fortrade),
-      want: Boolean(data.status._attributes.want),
-      wantToPlay: Boolean(data.status._attributes.wanttoplay),
-      wantToBuy: Boolean(data.status._attributes.wanttobuy),
-      wishList: Boolean(data.status._attributes.wishlist),
-      preOrdered: Boolean(data.status._attributes.preordered),
+      own: Boolean(Number(data.status._attributes.own)),
+      prevOwned: Boolean(Number(data.status._attributes.prevowned)),
+      forTrade: Boolean(Number(data.status._attributes.fortrade)),
+      want: Boolean(Number(data.status._attributes.want)),
+      wantToPlay: Boolean(Number(data.status._attributes.wanttoplay)),
+      wantToBuy: Boolean(Number(data.status._attributes.wanttobuy)),
+      wishList: Boolean(Number(data.status._attributes.wishlist)),
+      preOrdered: Boolean(Number(data.status._attributes.preordered)),
       lastModified: data.status._attributes.lastmodified,
     },
     numPlays: Number(data.numplays._text),
   };
 };
 
-export const collection = async (args: Args): Promise<Item[]> => {
+export const collection = async (args: Args): Promise<Payload | null> => {
   const params = getParams(args);
-  const { data } = await axios.get<Response>("/collection", {
+  const { data } = await axios.get<ApiResponse>("/collection", {
     params,
   });
 
-  return enforceArray(data.items?.item).map((data) => transformData(data));
+  if (!data.items) {
+    return null;
+  }
+
+  return {
+    attributes: {
+      termsOfUse: data.items._attributes.termsofuse,
+      totalItems: data.items._attributes.totalitems,
+      pubDate: data.items._attributes.pubdate,
+    },
+    items: enforceArray(data.items.item).map((data) => transformData(data)),
+  };
 };
