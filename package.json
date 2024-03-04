@@ -1,6 +1,6 @@
 {
   "name": "bgg-sdk",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Node SDK for querying the Board Game Geek (BGG) XML2 API",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
