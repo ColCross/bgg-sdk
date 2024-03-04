@@ -36,7 +36,7 @@ type Response = {
 type ResponseBody = {
   _attributes: { id: string; rank: string };
   name: { _attributes: { value: string } };
-  yearpublished?: { _attributes: { value: string } };
+  yearpublished: { _attributes: { value: string } };
   thumbnail: { _attributes: { value: string } };
 };
 
@@ -44,7 +44,7 @@ type Item = {
   id: string;
   rank: string;
   name: string;
-  yearpublished?: string;
+  yearPublished: string;
   thumbnail: string;
 };
 
@@ -53,7 +53,7 @@ const transformData = (data: ResponseBody): Item => {
     id: data._attributes.id,
     rank: data._attributes.rank,
     name: data.name._attributes.value,
-    yearpublished: data.yearpublished?._attributes.value,
+    yearPublished: data.yearpublished._attributes.value,
     thumbnail: data.thumbnail._attributes.value,
   };
 };
@@ -64,5 +64,5 @@ export const hot = async (args?: Args): Promise<Item[]> => {
     params,
   });
 
-  return enforceArray(data.items?.item).map((data) => transformData(data));
+  return enforceArray(data.items.item).map((data) => transformData(data));
 };

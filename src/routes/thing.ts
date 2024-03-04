@@ -364,5 +364,5 @@ export const thing = async (args: Args): Promise<Item[]> => {
   const params = getParams(args);
   const { data } = await axios.get<Response>("/thing", { params });
 
-  return enforceArray(data.items?.item).map((data) => transformData(data));
+  return enforceArray(data.items.item).map((data) => transformData(data));
 };

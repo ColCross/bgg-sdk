@@ -148,27 +148,27 @@ type ResponseBody = {
 };
 
 type Response = {
-  user: ResponseBody;
+  user?: ResponseBody;
 };
 
 type Item = {
   id: string;
   name: string;
-  termsofuse: string;
-  firstname: string;
-  lastname: string;
-  avatarlink: string;
-  yearregistered: string;
-  lastlogin: string;
-  stateorprovince: string;
+  termsOfUse: string;
+  firstName: string;
+  lastName: string;
+  avatarLink: string;
+  yearRegistered: string;
+  lastLogin: string;
+  stateOrProvince: string;
   country: string;
-  webaddress: string;
-  xboxaccount: string;
-  wiiaccount: string;
-  psnaccount: string;
-  battlenetaccount: string;
-  steamaccount: string;
-  traderating: string;
+  webAddress: string;
+  xboxAccount: string;
+  wiiAccount: string;
+  psnAccount: string;
+  battlenetAccount: string;
+  steamAccount: string;
+  tradeRating: string;
   buddies?: {
     total: string;
     page: string;
@@ -209,21 +209,21 @@ const transformData = (data: ResponseBody): Item => {
   return {
     id: data._attributes.id,
     name: data._attributes.name,
-    termsofuse: data._attributes.termsofuse,
-    firstname: data.firstname._attributes.value,
-    lastname: data.lastname._attributes.value,
-    avatarlink: data.avatarlink._attributes.value,
-    yearregistered: data.yearregistered._attributes.value,
-    lastlogin: data.lastlogin._attributes.value,
-    stateorprovince: data.stateorprovince._attributes.value,
+    termsOfUse: data._attributes.termsofuse,
+    firstName: data.firstname._attributes.value,
+    lastName: data.lastname._attributes.value,
+    avatarLink: data.avatarlink._attributes.value,
+    yearRegistered: data.yearregistered._attributes.value,
+    lastLogin: data.lastlogin._attributes.value,
+    stateOrProvince: data.stateorprovince._attributes.value,
     country: data.country._attributes.value,
-    webaddress: data.webaddress._attributes.value,
-    xboxaccount: data.xboxaccount._attributes.value,
-    wiiaccount: data.wiiaccount._attributes.value,
-    psnaccount: data.psnaccount._attributes.value,
-    battlenetaccount: data.battlenetaccount._attributes.value,
-    steamaccount: data.steamaccount._attributes.value,
-    traderating: data.traderating._attributes.value,
+    webAddress: data.webaddress._attributes.value,
+    xboxAccount: data.xboxaccount._attributes.value,
+    wiiAccount: data.wiiaccount._attributes.value,
+    psnAccount: data.psnaccount._attributes.value,
+    battlenetAccount: data.battlenetaccount._attributes.value,
+    steamAccount: data.steamaccount._attributes.value,
+    tradeRating: data.traderating._attributes.value,
     buddies: data.buddies
       ? {
           total: data.buddies._attributes.total,

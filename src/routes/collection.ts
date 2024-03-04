@@ -52,7 +52,7 @@ const getParams = (args: Args): Params => {
 };
 
 type Response = {
-  items: {
+  items?: {
     _attributes: {
       termsofuse: string;
       totalitems: string;
@@ -104,30 +104,30 @@ type ResponseBody = {
 
 type Item = {
   id: string;
-  collid: string;
+  collId: string;
   type: string;
   name: string;
-  yearPublished?: string;
+  yearPublished: string;
   image: string;
   thumbnail: string;
   status: {
     own: boolean;
-    prevowned: boolean;
-    fortrade: boolean;
+    prevOwned: boolean;
+    forTrade: boolean;
     want: boolean;
-    wanttoplay: boolean;
-    wanttobuy: boolean;
-    wishlist: boolean;
-    preordered: boolean;
-    lastmodified: string;
+    wantToPlay: boolean;
+    wantToBuy: boolean;
+    wishList: boolean;
+    preOrdered: boolean;
+    lastModified: string;
   };
-  numplays: number;
+  numPlays: number;
 };
 
 const transformData = (data: ResponseBody): Item => {
   return {
     id: data._attributes.objectid,
-    collid: data._attributes.collid,
+    collId: data._attributes.collid,
     type: data._attributes.objecttype,
     name: data.name._text,
     yearPublished: data.yearpublished?._text,
@@ -135,16 +135,16 @@ const transformData = (data: ResponseBody): Item => {
     thumbnail: data.thumbnail._text,
     status: {
       own: Boolean(data.status._attributes.own),
-      prevowned: Boolean(data.status._attributes.prevowned),
-      fortrade: Boolean(data.status._attributes.fortrade),
+      prevOwned: Boolean(data.status._attributes.prevowned),
+      forTrade: Boolean(data.status._attributes.fortrade),
       want: Boolean(data.status._attributes.want),
-      wanttoplay: Boolean(data.status._attributes.wanttoplay),
-      wanttobuy: Boolean(data.status._attributes.wanttobuy),
-      wishlist: Boolean(data.status._attributes.wishlist),
-      preordered: Boolean(data.status._attributes.preordered),
-      lastmodified: data.status._attributes.lastmodified,
+      wantToPlay: Boolean(data.status._attributes.wanttoplay),
+      wantToBuy: Boolean(data.status._attributes.wanttobuy),
+      wishList: Boolean(data.status._attributes.wishlist),
+      preOrdered: Boolean(data.status._attributes.preordered),
+      lastModified: data.status._attributes.lastmodified,
     },
-    numplays: Number(data.numplays._text),
+    numPlays: Number(data.numplays._text),
   };
 };
 
