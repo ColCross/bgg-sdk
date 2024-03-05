@@ -148,7 +148,7 @@ type ResponseBody = {
 };
 
 type Response = {
-  user?: ResponseBody;
+  user: ResponseBody;
 };
 
 type Item = {
@@ -203,6 +203,11 @@ type Item = {
       name: string;
     }[];
   };
+};
+
+type Payload = {
+  termsOfUse: string;
+  user: Item | null;
 };
 
 const transformData = (data: ResponseBody): Item => {
@@ -269,10 +274,13 @@ const transformData = (data: ResponseBody): Item => {
   };
 };
 
-export const user = async (params: Params): Promise<Item | null> => {
+export const user = async (params: Params): Promise<Payload> => {
   const { data } = await axios.get<Response>("/user", {
     params,
   });
 
-  return data.user ? transformData(data.user) : null;
+  return {
+    termsOfUse: data.user._attributes.termsofuse,
+    user: data.user ? transformData(data.user) : null,
+  };
 };
