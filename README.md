@@ -23,5 +23,6 @@ A modern SDK for interacting with the BoardGameGeek (BGG) XMLAPI2, written in Ty
 
 ## TODO
 
+- Make typing more consistent across routes (ex: page param)
 - Implement remaining endpoints
 - Create unit tests for all endpoints

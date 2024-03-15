@@ -1,5 +1,6 @@
 import { axios } from "~/lib/axios";
 import { enforceArray } from "~/lib/helpers";
+import { boardgame, rpg, videogame } from "~/routes/types";
 
 type Params = {
   name: string;

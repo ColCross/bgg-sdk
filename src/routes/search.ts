@@ -1,5 +1,12 @@
 import { axios } from "~/lib/axios";
 import { enforceArray } from "~/lib/helpers";
+import {
+  boardgame,
+  boardgameaccessory,
+  boardgameexpansion,
+  rpgitem,
+  videogame,
+} from "~/routes/types";
 
 type Args = {
   query: string;

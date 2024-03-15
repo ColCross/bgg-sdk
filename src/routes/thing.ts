@@ -1,5 +1,13 @@
 import { axios } from "~/lib/axios";
 import { enforceArray } from "~/lib/helpers";
+import {
+  boardgame,
+  boardgameaccessory,
+  boardgameexpansion,
+  rpgissue,
+  rpgitem,
+  videogame,
+} from "~/routes/types";
 
 type Args = {
   id: string[];

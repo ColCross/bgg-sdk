@@ -1,5 +1,15 @@
 import { axios } from "~/lib/axios";
 import { enforceArray } from "~/lib/helpers";
+import {
+  boardgame,
+  boardgamecompany,
+  boardgameperson,
+  rpg,
+  rpgcompany,
+  rpgperson,
+  videogame,
+  videogamecompany,
+} from "~/routes/types";
 
 type Args = {
   type: Array<
